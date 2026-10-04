@@ -1,0 +1,24 @@
+# PyCharm
+.idea/
+
+# Виртуальное окружение
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Базы данных SQLite
+*.sqlite3
+db.sqlite3
+
+# Env-файлы
+.env
+.env.*
+
+# Отчёты тестирования и покрытия
+.coverage
+coverage.xml
+htmlcov/
