@@ -6,7 +6,7 @@
 <h1 class="mb-4">Каталог товаров</h1>
 
 <div class="row g-4">
-    {% for product in products %}
+    {% for product in page_obj %}
     <div class="col-md-4">
         <div class="card h-100">
             {% if product.image %}
@@ -29,4 +29,26 @@
     <p>Товары пока не добавлены.</p>
     {% endfor %}
 </div>
+
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
 {% endblock %}

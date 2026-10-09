@@ -7,6 +7,7 @@ from catalog.views import (
     home,
     contacts,
     product_detail,
+    ProductCreateView,
 )
 
 from django.conf import settings
@@ -20,6 +21,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("", home, name="home"),
     path("contacts/", contacts, name="contacts"),
+    path("products/create/", ProductCreateView.as_view(), name="product_create"),
     path("products/<int:pk>/", product_detail, name="product_detail"),
 ]
 
