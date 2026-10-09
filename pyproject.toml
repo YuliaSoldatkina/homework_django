@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "homework-django"
+version = "0.1.0"
+description = ""
+authors = ["Yulia Soldatkina <yulia.soldatkina22@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.14"
+psycopg2-binary = "^2.9.13"
+pillow = "^12.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
