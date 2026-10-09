@@ -1,0 +1,24 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}{{ product.name }} — Catalog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        {% endif %}
+    </div>
+
+    <div class="col-md-7">
+        <h1>{{ product.name }}</h1>
+        <p class="text-muted">{{ product.category }}</p>
+        <p>{{ product.description }}</p>
+        <p class="fs-4 fw-bold">{{ product.price }} руб.</p>
+
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            Вернуться на главную
+        </a>
+    </div>
+</div>
+{% endblock %}

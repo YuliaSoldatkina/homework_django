@@ -1,0 +1,32 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Главная — Catalog{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Каталог товаров</h1>
+
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% endif %}
+
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">
+                    {{ product.description|truncatechars:100 }}
+                </p>
+                <p class="fw-bold">{{ product.price }} руб.</p>
+                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">
+                    Подробнее
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Товары пока не добавлены.</p>
+    {% endfor %}
+</div>
+{% endblock %}
