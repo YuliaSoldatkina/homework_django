@@ -1,26 +1,38 @@
-from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, TemplateView
+from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
 from rest_framework import viewsets
 
 from catalog.models import Category, Product
 from catalog.serializers import CategorySerializer, ProductSerializer
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
 
 
-def home(request):
-    products = Product.objects.all()
+class HomeView(ListView):
+    model = Product
+    template_name = "catalog/home.html"
+    context_object_name = "page_obj"
+    paginate_by = 3
 
-    paginator = Paginator(products, 3)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    context = {"page_obj": page_obj}
-    return render(request, "catalog/home.html", context)
+    def get_queryset(self):
+        return Product.objects.all()
 
 
-def contacts(request):
-    return render(request, "catalog/contacts.html")
+class ContactsView(TemplateView):
+    template_name = "catalog/contacts.html"
+
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = "catalog/product_detail.html"
+    context_object_name = "product"
+
+
+class ProductCreateView(CreateView):
+    model = Product
+    fields = ["name", "description", "image", "category", "price"]
+    template_name = "catalog/product_form.html"
+    success_url = reverse_lazy("home")
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -31,16 +43,3 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-
-def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    context = {"product": product}
-    return render(request, "catalog/product_detail.html", context)
-
-
-class ProductCreateView(CreateView):
-    model = Product
-    fields = ["name", "description", "image", "category", "price"]
-    template_name = "catalog/product_form.html"
-    success_url = reverse_lazy("home")
