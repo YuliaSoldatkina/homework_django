@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -28,6 +30,18 @@ class ArticleDetailView(DetailView):
         self.object = super().get_object(queryset)
         self.object.views_count += 1
         self.object.save()
+
+        if self.object.views_count == 100:
+            send_mail(
+                subject="Поздравляем: статья достигла 100 просмотров!",
+                message=(
+                    f"Статья «{self.object.title}» достигла 100 просмотров."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                fail_silently=False,
+            )
+
         return self.object
 
 
