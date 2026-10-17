@@ -66,3 +66,21 @@ class ProductForm(forms.ModelForm):
                         "class": "form-control",
                     }
                 )
+
+
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+
+        if image:
+            if image.size > 5 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Размер изображения не должен превышать 5 МБ."
+                )
+
+            allowed_formats = ["image/jpeg", "image/png"]
+            if image.content_type not in allowed_formats:
+                raise forms.ValidationError(
+                    "Допустимы только изображения в формате JPEG или PNG."
+                )
+
+        return image
