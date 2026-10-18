@@ -20,8 +20,16 @@
                 </p>
                 <p class="fw-bold">{{ product.price }} руб.</p>
                 <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">
-                    Подробнее
-                </a>
+    Подробнее
+</a>
+
+<a href="{% url 'product_update' product.pk %}" class="btn btn-warning">
+    Изменить
+</a>
+
+<a href="{% url 'product_delete' product.pk %}" class="btn btn-danger">
+    Удалить
+</a>
             </div>
         </div>
     </div>
