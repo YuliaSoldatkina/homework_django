@@ -1,15 +1,15 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from rest_framework import viewsets
 
+from catalog.forms import ProductForm
 from catalog.models import Category, Product
 from catalog.serializers import CategorySerializer, ProductSerializer
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from catalog.forms import ProductForm
 
 class HomeView(ListView):
     model = Product
@@ -25,12 +25,14 @@ class ContactsView(TemplateView):
     template_name = "catalog/contacts.html"
 
 
+@method_decorator(login_required, name="dispatch")
 class ProductDetailView(DetailView):
     model = Product
     template_name = "catalog/product_detail.html"
     context_object_name = "product"
 
 
+@method_decorator(login_required, name="dispatch")
 class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
@@ -38,6 +40,7 @@ class ProductCreateView(CreateView):
     success_url = reverse_lazy("home")
 
 
+@method_decorator(login_required, name="dispatch")
 class ProductUpdateView(UpdateView):
     model = Product
     form_class = ProductForm
@@ -45,6 +48,7 @@ class ProductUpdateView(UpdateView):
     success_url = reverse_lazy("home")
 
 
+@method_decorator(login_required, name="dispatch")
 class ProductDeleteView(DeleteView):
     model = Product
     template_name = "catalog/product_confirm_delete.html"
@@ -58,4 +62,4 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = CategorySerializer if False else ProductSerializer

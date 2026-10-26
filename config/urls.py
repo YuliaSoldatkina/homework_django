@@ -15,6 +15,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("", include("catalog.urls")),
     path("blogs/", include("blog.urls")),
+    path("users/", include("users.urls")),
 ]
 
 if settings.DEBUG:
