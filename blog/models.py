@@ -31,6 +31,9 @@ class Article(models.Model):
     class Meta:
         verbose_name = "Блоговая запись"
         verbose_name_plural = "Блоговые записи"
+        permissions = [
+            ("can_publish_article", "Может публиковать блоговые записи"),
+        ]
 
     def __str__(self):
         return self.title

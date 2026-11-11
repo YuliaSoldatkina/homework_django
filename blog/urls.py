@@ -10,4 +10,6 @@ urlpatterns = [
     path("create/", views.ArticleCreateView.as_view(), name="article_create"),
     path("<int:pk>/update/", views.ArticleUpdateView.as_view(), name="article_update"),
     path("<int:pk>/delete/", views.ArticleDeleteView.as_view(), name="article_delete"),
+    path("<int:pk>/publish/", views.ArticlePublishView.as_view(), name="article_publish"),
+    path("<int:pk>/unpublish/", views.ArticleUnpublishView.as_view(), name="article_unpublish"),
 ]

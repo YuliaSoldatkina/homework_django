@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -39,6 +42,10 @@ class ProductCreateView(CreateView):
     template_name = "catalog/product_form.html"
     success_url = reverse_lazy("home")
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 @method_decorator(login_required, name="dispatch")
 class ProductUpdateView(UpdateView):
@@ -47,12 +54,59 @@ class ProductUpdateView(UpdateView):
     template_name = "catalog/product_form.html"
     success_url = reverse_lazy("home")
 
+    def get_object(self, queryset=None):
+        product = super().get_object(queryset)
+
+        if product.owner != self.request.user:
+            raise PermissionDenied
+
+        return product
+
 
 @method_decorator(login_required, name="dispatch")
 class ProductDeleteView(DeleteView):
     model = Product
     template_name = "catalog/product_confirm_delete.html"
     success_url = reverse_lazy("home")
+
+    def get_object(self, queryset=None):
+        product = super().get_object(queryset)
+
+        is_owner = product.owner == self.request.user
+        is_moderator = self.request.user.has_perm("catalog.delete_product")
+
+        if not is_owner and not is_moderator:
+            raise PermissionDenied
+
+        return product
+
+
+@method_decorator(login_required, name="dispatch")
+class ProductUnpublishView(PermissionRequiredMixin, UpdateView):
+    model = Product
+    fields = []
+    http_method_names = ["post"]
+    permission_required = "catalog.can_unpublish_product"
+
+    def post(self, request, *args, **kwargs):
+        product = self.get_object()
+        product.is_published = False
+        product.save()
+        return redirect(reverse("home"))
+
+
+@method_decorator(login_required, name="dispatch")
+class ProductPublishView(PermissionRequiredMixin, UpdateView):
+    model = Product
+    fields = []
+    http_method_names = ["post"]
+    permission_required = "catalog.can_unpublish_product"
+
+    def post(self, request, *args, **kwargs):
+        product = self.get_object()
+        product.is_published = True
+        product.save()
+        return redirect(reverse("home"))
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -62,4 +116,4 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
-    serializer_class = CategorySerializer if False else ProductSerializer
+    serializer_class = ProductSerializer

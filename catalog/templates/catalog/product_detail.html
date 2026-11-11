@@ -16,9 +16,49 @@
         <p>{{ product.description }}</p>
         <p class="fs-4 fw-bold">{{ product.price }} руб.</p>
 
-        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
-            Вернуться на главную
-        </a>
+        <p>
+            {% if product.is_published %}
+                <span class="badge bg-success">Опубликован</span>
+            {% else %}
+                <span class="badge bg-secondary">Не опубликован</span>
+            {% endif %}
+        </p>
+
+        <div class="mb-3">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                Вернуться на главную
+            </a>
+        </div>
+
+        {% if product.owner == user or perms.catalog.delete_product %}
+        <div class="mb-2">
+            <a href="{% url 'product_update' product.pk %}" class="btn btn-warning">
+                Изменить
+            </a>
+
+            <a href="{% url 'product_delete' product.pk %}" class="btn btn-danger">
+                Удалить
+            </a>
+        </div>
+        {% endif %}
+
+        {% if perms.catalog.can_unpublish_product %}
+    {% if product.is_published %}
+    <form method="post" action="{% url 'product_unpublish' product.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">
+            Отменить публикацию
+        </button>
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'product_publish' product.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-success">
+            Опубликовать
+        </button>
+    </form>
+    {% endif %}
+{% endif %}
     </div>
 </div>
 {% endblock %}
