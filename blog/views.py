@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import send_mail
+from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -45,24 +47,52 @@ class ArticleDetailView(DetailView):
         return self.object
 
 
-class ArticleCreateView(CreateView):
+class ArticleCreateView(PermissionRequiredMixin, CreateView):
     model = Article
     fields = ["title", "content", "preview", "is_published"]
     template_name = "blog/article_form.html"
     success_url = reverse_lazy("blog:article_list")
+    permission_required = "blog.add_article"
 
 
-class ArticleUpdateView(UpdateView):
+class ArticleUpdateView(PermissionRequiredMixin, UpdateView):
     model = Article
     fields = ["title", "content", "preview", "is_published"]
     template_name = "blog/article_form.html"
-    success_url = reverse_lazy("blog:article_detail")
+    permission_required = "blog.change_article"
 
     def get_success_url(self):
         return reverse_lazy("blog:article_detail", kwargs={"pk": self.object.pk})
 
 
-class ArticleDeleteView(DeleteView):
+class ArticleDeleteView(PermissionRequiredMixin, DeleteView):
     model = Article
     template_name = "blog/article_confirm_delete.html"
     success_url = reverse_lazy("blog:article_list")
+    permission_required = "blog.delete_article"
+
+
+class ArticlePublishView(PermissionRequiredMixin, UpdateView):
+    model = Article
+    fields = []
+    http_method_names = ["post"]
+    permission_required = "blog.can_publish_article"
+
+    def post(self, request, *args, **kwargs):
+        article = self.get_object()
+        article.is_published = True
+        article.save()
+        return redirect(reverse("blog:article_list"))
+
+
+class ArticleUnpublishView(PermissionRequiredMixin, UpdateView):
+    model = Article
+    fields = []
+    http_method_names = ["post"]
+    permission_required = "blog.can_publish_article"
+
+    def post(self, request, *args, **kwargs):
+        article = self.get_object()
+        article.is_published = False
+        article.save()
+        return redirect(reverse("blog:article_list"))

@@ -5,6 +5,14 @@
 {% block content %}
 <h1 class="mb-4">Блог</h1>
 
+{% if perms.blog.add_article %}
+<div class="mb-4">
+    <a href="{% url 'blog:article_create' %}" class="btn btn-success">
+        Добавить статью
+    </a>
+</div>
+{% endif %}
+
 <div class="row">
     {% for article in articles %}
     <div class="col-md-4 mb-4">
@@ -22,6 +30,36 @@
             <div class="card-footer text-muted">
                 {{ article.created_at|date:"d.m.Y H:i" }} |
                 Просмотры: {{ article.views_count }}
+
+                {% if perms.blog.change_article %}
+                <a href="{% url 'blog:article_update' article.pk %}" class="btn btn-warning btn-sm">
+                    Изменить
+                </a>
+                {% endif %}
+
+                {% if perms.blog.delete_article %}
+                <a href="{% url 'blog:article_delete' article.pk %}" class="btn btn-danger btn-sm">
+                    Удалить
+                </a>
+                {% endif %}
+
+                {% if perms.blog.can_publish_article %}
+                    {% if article.is_published %}
+                    <form method="post" action="{% url 'blog:article_unpublish' article.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            Отменить публикацию
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="post" action="{% url 'blog:article_publish' article.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success btn-sm">
+                            Опубликовать
+                        </button>
+                    </form>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -29,8 +67,4 @@
     <p>Пока нет опубликованных статей.</p>
     {% endfor %}
 </div>
-
-<a href="{% url 'blog:article_create' %}" class="btn btn-success">
-    Добавить статью
-</a>
 {% endblock %}
