@@ -12,7 +12,8 @@ from rest_framework import viewsets
 from catalog.forms import ProductForm
 from catalog.models import Category, Product
 from catalog.serializers import CategorySerializer, ProductSerializer
-
+from django.views.decorators.cache import cache_page
+from catalog.services import get_products_by_category
 
 class HomeView(ListView):
     model = Product
@@ -28,7 +29,19 @@ class ContactsView(TemplateView):
     template_name = "catalog/contacts.html"
 
 
+
 @method_decorator(login_required, name="dispatch")
+class ProductsByCategoryView(ListView):
+    model = Product
+    template_name = "catalog/products_by_category.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        return get_products_by_category(self.kwargs["category_id"])
+
+
+@method_decorator(login_required, name="dispatch")
+@method_decorator(cache_page(60), name="dispatch")
 class ProductDetailView(DetailView):
     model = Product
     template_name = "catalog/product_detail.html"

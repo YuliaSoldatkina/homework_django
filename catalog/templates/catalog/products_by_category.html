@@ -1,0 +1,26 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Товары категории{% endblock %}
+
+{% block content %}
+<h1>Товары категории</h1>
+
+{% if products %}
+    <ul>
+        {% for product in products %}
+            <li>
+                <a href="{% url 'product_detail' product.pk %}">
+                    {{ product.name }}
+                </a>
+                — {{ product.price }} руб.
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>В этой категории пока нет товаров.</p>
+{% endif %}
+
+<a href="{% url 'home' %}" class="btn btn-outline-secondary">
+    Вернуться на главную
+</a>
+{% endblock %}
